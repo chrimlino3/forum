@@ -25,7 +25,7 @@
     },
     "config": {
         "optimize-autoloader": true,
-        "preferred-install": "dist",HomeController
+        "preferred-install": "dist",
         "sort-packages": true
     },
     "extra": {
