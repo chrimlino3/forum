@@ -8,13 +8,16 @@ use App\Models\Thread;
 use App\Models\User;
 use Facade\FlareClient\Api;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReplyController extends Api
 {
     public function index()
     {
         $reply = Reply::all();
+
         return response()->json($reply);
     }
 
@@ -22,10 +25,8 @@ class ReplyController extends Api
     {
         $reply = Reply::firstOrCreate(
             [
-                'user_id' => User::findOrFail(1),
+                'user_id' => Auth::user(),
                 'thread_id' => $thread->id,
-            ],
-            [
                 'body' => $request->body,
             ]
         );
@@ -41,7 +42,7 @@ class ReplyController extends Api
 
     public function update(Request $request, Reply $reply)
     {
-        if ($request->user()->id !== $reply->user_id) {
+        if (Auth::user() !== $reply->user_id) {
             return response()->json(['error' => 'You can only edit your own comments.'], 403);
         }
 
@@ -52,6 +53,12 @@ class ReplyController extends Api
 
     public function destroy(Reply $reply)
     {
-        //
+        if (Auth::user() !== $reply->user_id) {
+            return response()->json(['error' => 'You can only delete your own comments.'], 403);
+        }
+
+        $reply->destroy($reply);
+
+        return redirect()->route('api.v2.replies');
     }
 }

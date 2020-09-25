@@ -2,84 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ThreadResource;
 use App\Models\Thread;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ThreadController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $thread = Thread::all();
+
+        return response()->json($thread);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $thread = Thread::firstOrCreate([
+            'user_id' => Auth::user(),
+            'title' => $request->title,
+            'body'  => $request->body,
+        ]);
+
+        return new ThreadResource($thread);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
     public function show(Thread $thread)
     {
-        //
+        return new ThreadResource($thread);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Thread $thread)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Thread $thread)
     {
-        //
+        if (Auth::user() !== $thread->user_id) {
+            return response()->json(['error' => 'You can only edit your own comments.'], 403);
+        }
+
+        $thread->update($request->only(['title', 'body']));
+
+        return new ThreadResource($thread);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Thread $thread)
     {
-        //
+        if (Auth::user() !== $thread->user_id) {
+            return response()->json(['error' => 'You can only delete your own comments.'], 403);
+        }
+
+        $thread->destroy($thread);
+
+        return redirect()->route('api.v2.threads');
     }
 }
