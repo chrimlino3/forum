@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ThreadRequest;
 use App\Http\Resources\ThreadResource;
 use App\Models\Thread;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ThreadController extends Controller
@@ -16,12 +16,12 @@ class ThreadController extends Controller
         return response()->json($thread);
     }
 
-    public function store(Request $request)
+    public function store(ThreadRequest $threadRequest)
     {
         $thread = Thread::firstOrCreate([
             'user_id' => Auth::user(),
-            'title' => $request->title,
-            'body'  => $request->body,
+            'title' => $threadRequest->title,
+            'body'  => $threadRequest->body,
         ]);
 
         return new ThreadResource($thread);
@@ -32,13 +32,13 @@ class ThreadController extends Controller
         return new ThreadResource($thread);
     }
 
-    public function update(Request $request, Thread $thread)
+    public function update(ThreadRequest $threadRequest, Thread $thread)
     {
         if (Auth::user() !== $thread->user_id) {
             return response()->json(['error' => 'You can only edit your own comments.'], 403);
         }
 
-        $thread->update($request->only(['title', 'body']));
+        $thread->update($threadRequest->only(['title', 'body']));
 
         return new ThreadResource($thread);
     }
