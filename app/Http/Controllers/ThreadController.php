@@ -16,6 +16,11 @@ class ThreadController extends Controller
         return response()->json($thread);
     }
 
+    public function show(Thread $thread)
+    {
+        return new ThreadResource($thread);
+    }
+
     public function store(ThreadRequest $threadRequest)
     {
         $thread = Thread::firstOrCreate([
@@ -24,11 +29,6 @@ class ThreadController extends Controller
             'body'  => $threadRequest->body,
         ]);
 
-        return new ThreadResource($thread);
-    }
-
-    public function show(Thread $thread)
-    {
         return new ThreadResource($thread);
     }
 

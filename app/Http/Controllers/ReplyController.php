@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReplyRequest;
 use App\Http\Resources\ReplyResource;
 use App\Models\Reply;
 use App\Models\Thread;
@@ -21,32 +22,31 @@ class ReplyController extends Api
         return response()->json($reply);
     }
 
-    public function store(Request $request, Thread $thread)
+    public function show(Reply $reply)
+    {
+        return new ReplyResource($reply);
+    }
+
+    public function store(ReplyRequest $replyRequest, Thread $thread)
     {
         $reply = Reply::firstOrCreate(
             [
                 'user_id' => Auth::user(),
                 'thread_id' => $thread->id,
-                'body' => $request->body,
+                'body' => $replyRequest->body,
             ]
         );
 
         return new ReplyResource($reply);
     }
 
-    public function show(Reply $reply)
-    {
-        return new ReplyResource($reply);
-    }
-
-
-    public function update(Request $request, Reply $reply)
+    public function update(ReplyRequest $replyRequest, Reply $reply)
     {
         if (Auth::user() !== $reply->user_id) {
             return response()->json(['error' => 'You can only edit your own comments.'], 403);
         }
 
-        $reply->update($request->only(['body']));
+        $reply->update($replyRequest->only(['body']));
 
         return new ReplyResource($reply);
     }
