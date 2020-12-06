@@ -29,3 +29,4 @@ Homestead.json
 _ide_helper.php
 app/Http/routes-conflict.php
 codeception.yml
+.idea/php.xml
