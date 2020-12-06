@@ -12,5 +12,10 @@ class ThreadsTest extends TestCase
         $this->thread = factory(Thread::class)->create();
     }
 
+    public function testShowWithAuthorizedUser(PortalTester $I)
+    {
+        $I->amLoggedAs($customer, 'web');
+    }
+
 
 }
