@@ -17,9 +17,16 @@ public_html/hot
 
 storage/*.key
 .env.example
+.env.testing
 .env
 .idea
 Homestead.yaml
 Homestead.json
 /.vagrant
 .phpunit.result.cache
+.phpstorm.meta.php
+.scannerwork
+_ide_helper.php
+app/Http/routes-conflict.php
+codeception.yml
+.idea/php.xml
